@@ -21,6 +21,7 @@ print("\n--- Rentals: structure ---")
 rentals_df.info()
 
 
+
 #Task 2: Data cleaning
 # Make separate copies for cleaning
 equipment_clean = equipment_df.copy()
@@ -69,5 +70,73 @@ print("\n--- Rentals: exact duplicates ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
 rentals_clean = rentals_clean.drop_duplicates(keep="first")
+print("Rows removed:", before - len(rentals_clean))
+print("Rows remaining:", len(rentals_clean))
+
+
+# Step 3: Validate numeric values
+# Equipment
+print("\n--- Equipment: numeric validation ---")
+before = len(equipment_clean)
+print("Rows before this step:", before)
+
+for column in ["equipment_id", "daily_rate", "stock_quantity"]:
+    equipment_clean[column] = pd.to_numeric(
+        equipment_clean[column], errors="coerce"
+    )
+
+equipment_clean = equipment_clean[
+    (equipment_clean["equipment_id"] > 0)
+    & (equipment_clean["equipment_id"] % 1 == 0)
+    & (equipment_clean["daily_rate"] >= 1)
+    & (equipment_clean["stock_quantity"] >= 0)
+    & (equipment_clean["stock_quantity"] % 1 == 0)
+].copy()
+
+print("Rows removed:", before - len(equipment_clean))
+print("Rows remaining:", len(equipment_clean))
+
+# Members
+print("\n--- Members: numeric validation ---")
+before = len(members_clean)
+print("Rows before this step:", before)
+
+members_clean["member_id"] = pd.to_numeric(
+    members_clean["member_id"], errors="coerce"
+)
+
+members_clean = members_clean[
+    (members_clean["member_id"] > 0)
+    & (members_clean["member_id"] % 1 == 0)
+].copy()
+
+print("Rows removed:", before - len(members_clean))
+print("Rows remaining:", len(members_clean))
+
+# Rentals
+print("\n--- Rentals: numeric validation ---")
+before = len(rentals_clean)
+print("Rows before this step:", before)
+
+for column in [
+    "rental_id", "member_id", "equipment_id", "quantity", "rental_days"
+]:
+    rentals_clean[column] = pd.to_numeric(
+        rentals_clean[column], errors="coerce"
+    )
+
+rentals_clean = rentals_clean[
+    (rentals_clean["rental_id"] > 0)
+    & (rentals_clean["rental_id"] % 1 == 0)
+    & (rentals_clean["member_id"] > 0)
+    & (rentals_clean["member_id"] % 1 == 0)
+    & (rentals_clean["equipment_id"] > 0)
+    & (rentals_clean["equipment_id"] % 1 == 0)
+    & (rentals_clean["quantity"] > 0)
+    & (rentals_clean["quantity"] % 1 == 0)
+    & (rentals_clean["rental_days"] > 0)
+    & (rentals_clean["rental_days"] % 1 == 0)
+].copy()
+
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
