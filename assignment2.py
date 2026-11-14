@@ -222,3 +222,13 @@ q1 = equipment_clean.loc[
 ]
 q1 = q1.sort_values("equipment_id")
 print(q1.to_string(index=False))
+
+
+# Q2
+print("\n--- Q2 ---")
+q2 = members_clean.loc[
+    members_clean["city"] == "Montreal",
+    ["member_id", "member_name"]
+]
+q2 = q2.sort_values("member_id")
+print(q2.to_string(index=False))
