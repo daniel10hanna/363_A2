@@ -170,3 +170,30 @@ rentals_clean = rentals_clean.dropna(subset=["rental_date"]).copy()
 
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
+
+
+
+# Step 5: Validate rental references
+# Parent tables stay unchanged during this step
+print("\n--- Equipment: reference validation ---")
+print("Rows before this step:", len(equipment_clean))
+print("Rows removed:", 0)
+print("Rows remaining:", len(equipment_clean))
+
+print("\n--- Members: reference validation ---")
+print("Rows before this step:", len(members_clean))
+print("Rows removed:", 0)
+print("Rows remaining:", len(members_clean))
+
+# Keep rentals only when both references exist
+print("\n--- Rentals: reference validation ---")
+before = len(rentals_clean)
+print("Rows before this step:", before)
+
+rentals_clean = rentals_clean[
+    rentals_clean["member_id"].isin(members_clean["member_id"])
+    & rentals_clean["equipment_id"].isin(equipment_clean["equipment_id"])
+].copy()
+
+print("Rows removed:", before - len(rentals_clean))
+print("Rows remaining:", len(rentals_clean))
