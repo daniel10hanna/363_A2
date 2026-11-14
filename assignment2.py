@@ -197,3 +197,18 @@ rentals_clean = rentals_clean[
 
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
+
+
+
+# Step 6: Final row counts and primary-key uniqueness
+print("\n--- Equipment: final checks ---")
+print("Final row count:", len(equipment_clean))
+print("equipment_id is unique:", equipment_clean["equipment_id"].is_unique)
+
+print("\n--- Members: final checks ---")
+print("Final row count:", len(members_clean))
+print("member_id is unique:", members_clean["member_id"].is_unique)
+
+print("\n--- Rentals: final checks ---")
+print("Final row count:", len(rentals_clean))
+print("rental_id is unique:", rentals_clean["rental_id"].is_unique)
