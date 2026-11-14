@@ -142,7 +142,6 @@ print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-
 # Step 4: Validate rental dates
 # Equipment and members have no date columns to validate
 print("\n--- Equipment: date validation ---")
@@ -172,7 +171,6 @@ print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-
 # Step 5: Validate rental references
 # Parent tables stay unchanged during this step
 print("\n--- Equipment: reference validation ---")
@@ -199,7 +197,6 @@ print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-
 # Step 6: Final row counts and primary-key uniqueness
 print("\n--- Equipment: final checks ---")
 print("Final row count:", len(equipment_clean))
@@ -212,3 +209,16 @@ print("member_id is unique:", members_clean["member_id"].is_unique)
 print("\n--- Rentals: final checks ---")
 print("Final row count:", len(rentals_clean))
 print("rental_id is unique:", rentals_clean["rental_id"].is_unique)
+
+
+
+# Task 3: Pandas queries
+
+# Q1
+print("\n--- Q1 ---")
+q1 = equipment_clean.loc[
+    equipment_clean["daily_rate"] > 40,
+    ["equipment_id", "equipment_name"]
+]
+q1 = q1.sort_values("equipment_id")
+print(q1.to_string(index=False))
