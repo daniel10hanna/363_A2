@@ -140,3 +140,33 @@ rentals_clean = rentals_clean[
 
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
+
+
+
+# Step 4: Validate rental dates
+# Equipment and members have no date columns to validate
+print("\n--- Equipment: date validation ---")
+print("Rows before this step:", len(equipment_clean))
+print("Rows removed:", 0)
+print("Rows remaining:", len(equipment_clean))
+
+print("\n--- Members: date validation ---")
+print("Rows before this step:", len(members_clean))
+print("Rows removed:", 0)
+print("Rows remaining:", len(members_clean))
+
+# Validate dates in rentals
+print("\n--- Rentals: date validation ---")
+before = len(rentals_clean)
+print("Rows before this step:", before)
+
+rentals_clean["rental_date"] = pd.to_datetime(
+    rentals_clean["rental_date"],
+    format="%Y-%m-%d",
+    errors="coerce"
+)
+
+rentals_clean = rentals_clean.dropna(subset=["rental_date"]).copy()
+
+print("Rows removed:", before - len(rentals_clean))
+print("Rows remaining:", len(rentals_clean))
