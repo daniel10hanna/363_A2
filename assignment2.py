@@ -48,3 +48,26 @@ print("Initial row count:", before)
 rentals_clean = rentals_clean.dropna()
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
+
+
+# Step 2: Remove exact duplicate rows
+print("\n--- Equipment: exact duplicates ---")
+before = len(equipment_clean)
+print("Rows before this step:", before)
+equipment_clean = equipment_clean.drop_duplicates(keep="first")
+print("Rows removed:", before - len(equipment_clean))
+print("Rows remaining:", len(equipment_clean))
+
+print("\n--- Members: exact duplicates ---")
+before = len(members_clean)
+print("Rows before this step:", before)
+members_clean = members_clean.drop_duplicates(keep="first")
+print("Rows removed:", before - len(members_clean))
+print("Rows remaining:", len(members_clean))
+
+print("\n--- Rentals: exact duplicates ---")
+before = len(rentals_clean)
+print("Rows before this step:", before)
+rentals_clean = rentals_clean.drop_duplicates(keep="first")
+print("Rows removed:", before - len(rentals_clean))
+print("Rows remaining:", len(rentals_clean))
