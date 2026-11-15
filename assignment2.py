@@ -1,4 +1,4 @@
-# Task 1
+#Task 1: Data loading
 import pandas as pd
 
 equipment_df = pd.read_csv("Tables/equipment.csv")
@@ -22,13 +22,13 @@ rentals_df.info()
 
 
 
-# Task 2
-# Make copies 
+#Task 2: Data cleaning
+# Make copies for cleaning
 equipment_clean = equipment_df.copy()
 members_clean = members_df.copy()
 rentals_clean = rentals_df.copy()
 
-# Step 1
+# Step 1: Remove rows with missing value
 print("\n--- Equipment: missing values ---")
 before = len(equipment_clean)
 print("Initial row count:", before)
@@ -51,7 +51,7 @@ print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-# Step 2
+# Step 2: Remove duplicate rows
 print("\n--- Equipment: exact duplicates ---")
 before = len(equipment_clean)
 print("Rows before this step:", before)
@@ -74,15 +74,17 @@ print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-# Step 3
+# Step 3: Validate numeric values
 # Equipment
 print("\n--- Equipment: numeric validation ---")
 before = len(equipment_clean)
 print("Rows before this step:", before)
+
 for column in ["equipment_id", "daily_rate", "stock_quantity"]:
     equipment_clean[column] = pd.to_numeric(
         equipment_clean[column], errors="coerce"
     )
+
 equipment_clean = equipment_clean[
     (equipment_clean["equipment_id"] > 0)
     & (equipment_clean["equipment_id"] % 1 == 0)
@@ -90,6 +92,7 @@ equipment_clean = equipment_clean[
     & (equipment_clean["stock_quantity"] >= 0)
     & (equipment_clean["stock_quantity"] % 1 == 0)
 ].copy()
+
 print("Rows removed:", before - len(equipment_clean))
 print("Rows remaining:", len(equipment_clean))
 
@@ -97,13 +100,16 @@ print("Rows remaining:", len(equipment_clean))
 print("\n--- Members: numeric validation ---")
 before = len(members_clean)
 print("Rows before this step:", before)
+
 members_clean["member_id"] = pd.to_numeric(
     members_clean["member_id"], errors="coerce"
 )
+
 members_clean = members_clean[
     (members_clean["member_id"] > 0)
     & (members_clean["member_id"] % 1 == 0)
 ].copy()
+
 print("Rows removed:", before - len(members_clean))
 print("Rows remaining:", len(members_clean))
 
@@ -111,12 +117,14 @@ print("Rows remaining:", len(members_clean))
 print("\n--- Rentals: numeric validation ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
+
 for column in [
     "rental_id", "member_id", "equipment_id", "quantity", "rental_days"
 ]:
     rentals_clean[column] = pd.to_numeric(
         rentals_clean[column], errors="coerce"
     )
+
 rentals_clean = rentals_clean[
     (rentals_clean["rental_id"] > 0)
     & (rentals_clean["rental_id"] % 1 == 0)
@@ -129,12 +137,13 @@ rentals_clean = rentals_clean[
     & (rentals_clean["rental_days"] > 0)
     & (rentals_clean["rental_days"] % 1 == 0)
 ].copy()
+
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-# Step 4
-# Invalid dates
+# Step 4: Validate rental dates
+# Equipment and members no dates
 print("\n--- Equipment: date validation ---")
 print("Rows before this step:", len(equipment_clean))
 print("Rows removed:", 0)
@@ -145,21 +154,25 @@ print("Rows before this step:", len(members_clean))
 print("Rows removed:", 0)
 print("Rows remaining:", len(members_clean))
 
-# Validate dates
+# Validate dates in rentals
 print("\n--- Rentals: date validation ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
+
 rentals_clean["rental_date"] = pd.to_datetime(
     rentals_clean["rental_date"],
     format="%Y-%m-%d",
     errors="coerce"
 )
+
 rentals_clean = rentals_clean.dropna(subset=["rental_date"]).copy()
+
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-#Step 5
+# Step 5: Validate rental references
+# Parent tables unchanged
 print("\n--- Equipment: reference validation ---")
 print("Rows before this step:", len(equipment_clean))
 print("Rows removed:", 0)
@@ -170,6 +183,7 @@ print("Rows before this step:", len(members_clean))
 print("Rows removed:", 0)
 print("Rows remaining:", len(members_clean))
 
+# Keep rentals with existing references
 print("\n--- Rentals: reference validation ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
@@ -183,7 +197,7 @@ print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
 
-#Step 6
+# Step 6: Final row counts
 print("\n--- Equipment: final checks ---")
 print("Final row count:", len(equipment_clean))
 print("equipment_id is unique:", equipment_clean["equipment_id"].is_unique)
@@ -198,7 +212,7 @@ print("rental_id is unique:", rentals_clean["rental_id"].is_unique)
 
 
 
-# Task 3
+# Task 3: Pandas queries
 
 # Q1
 print("\n--- Q1 ---")
@@ -447,16 +461,3 @@ print(q19.to_string(
     index=False,
     formatters={"total_spending": "{:.2f}".format}
 ))
-
-
-# Q20
-print("\n--- Q20 ---")
-q20 = (
-    rentals_clean
-    .groupby(["member_id", "equipment_id"])["rental_id"]
-    .count()
-    .reset_index(name="rental_count")
-)
-q20 = q20.loc[q20["rental_count"] > 1]
-q20 = q20.sort_values(["member_id", "equipment_id"])
-print(q20.to_string(index=False))
