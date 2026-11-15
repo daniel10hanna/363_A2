@@ -238,3 +238,8 @@ print(q2.to_string(index=False))
 print("\n--- Q3 ---")
 q3 = len(members_clean)
 print(q3)
+
+# Q4
+print("\n--- Q4 ---")
+q4 = rentals_clean.loc[rentals_clean["quantity"] > 5, "rental_id"].count()
+print(q4)
