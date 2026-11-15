@@ -79,12 +79,10 @@ print("Rows remaining:", len(rentals_clean))
 print("\n--- Equipment: numeric validation ---")
 before = len(equipment_clean)
 print("Rows before this step:", before)
-
 for column in ["equipment_id", "daily_rate", "stock_quantity"]:
     equipment_clean[column] = pd.to_numeric(
         equipment_clean[column], errors="coerce"
     )
-
 equipment_clean = equipment_clean[
     (equipment_clean["equipment_id"] > 0)
     & (equipment_clean["equipment_id"] % 1 == 0)
@@ -92,7 +90,6 @@ equipment_clean = equipment_clean[
     & (equipment_clean["stock_quantity"] >= 0)
     & (equipment_clean["stock_quantity"] % 1 == 0)
 ].copy()
-
 print("Rows removed:", before - len(equipment_clean))
 print("Rows remaining:", len(equipment_clean))
 
@@ -100,16 +97,13 @@ print("Rows remaining:", len(equipment_clean))
 print("\n--- Members: numeric validation ---")
 before = len(members_clean)
 print("Rows before this step:", before)
-
 members_clean["member_id"] = pd.to_numeric(
     members_clean["member_id"], errors="coerce"
 )
-
 members_clean = members_clean[
     (members_clean["member_id"] > 0)
     & (members_clean["member_id"] % 1 == 0)
 ].copy()
-
 print("Rows removed:", before - len(members_clean))
 print("Rows remaining:", len(members_clean))
 
@@ -117,14 +111,12 @@ print("Rows remaining:", len(members_clean))
 print("\n--- Rentals: numeric validation ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
-
 for column in [
     "rental_id", "member_id", "equipment_id", "quantity", "rental_days"
 ]:
     rentals_clean[column] = pd.to_numeric(
         rentals_clean[column], errors="coerce"
     )
-
 rentals_clean = rentals_clean[
     (rentals_clean["rental_id"] > 0)
     & (rentals_clean["rental_id"] % 1 == 0)
@@ -137,7 +129,6 @@ rentals_clean = rentals_clean[
     & (rentals_clean["rental_days"] > 0)
     & (rentals_clean["rental_days"] % 1 == 0)
 ].copy()
-
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
@@ -158,15 +149,12 @@ print("Rows remaining:", len(members_clean))
 print("\n--- Rentals: date validation ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
-
 rentals_clean["rental_date"] = pd.to_datetime(
     rentals_clean["rental_date"],
     format="%Y-%m-%d",
     errors="coerce"
 )
-
 rentals_clean = rentals_clean.dropna(subset=["rental_date"]).copy()
-
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
@@ -187,12 +175,10 @@ print("Rows remaining:", len(members_clean))
 print("\n--- Rentals: reference validation ---")
 before = len(rentals_clean)
 print("Rows before this step:", before)
-
 rentals_clean = rentals_clean[
     rentals_clean["member_id"].isin(members_clean["member_id"])
     & rentals_clean["equipment_id"].isin(equipment_clean["equipment_id"])
 ].copy()
-
 print("Rows removed:", before - len(rentals_clean))
 print("Rows remaining:", len(rentals_clean))
 
@@ -214,7 +200,7 @@ print("rental_id is unique:", rentals_clean["rental_id"].is_unique)
 
 # Task 3: Pandas queries
 
-# Q1
+# Q1 
 print("\n--- Q1 ---")
 q1 = equipment_clean.loc[
     equipment_clean["daily_rate"] > 40,
@@ -222,6 +208,7 @@ q1 = equipment_clean.loc[
 ]
 q1 = q1.sort_values("equipment_id")
 print(q1.to_string(index=False))
+# I filtered the cleaned equipment table to keep items with a daily rate greater than CAD 40.
 
 
 # Q2
@@ -232,23 +219,28 @@ q2 = members_clean.loc[
 ]
 q2 = q2.sort_values("member_id")
 print(q2.to_string(index=False))
+# I selected members whose city is Montreal and displayed their IDs and names in ascending order of member ID.
 
 
 # Q3
 print("\n--- Q3 ---")
 q3 = len(members_clean)
 print(q3)
+# I counted all rows in the cleaned members table. This includes members who have never rented equipment.
+
 
 # Q4
 print("\n--- Q4 ---")
 q4 = rentals_clean.loc[rentals_clean["quantity"] > 5, "rental_id"].count()
 print(q4)
+# I selected rentals with a quantity greater than 5 and counted their rental IDs. Each matching transaction is counted once, regardless of the number of units rented.
 
 
 # Q5
 print("\n--- Q5 ---")
 q5 = equipment_clean["daily_rate"].mean()
 print(f"{q5:.2f}")
+# I calculated the average daily rate across all cleaned equipment records, including items never rented. I displayed the result to two decimal places.
 
 
 # Q6
@@ -262,6 +254,7 @@ print(q6.to_string(
     index=False,
     formatters={"daily_rate": "{:.2f}".format}
 ))
+# I found the highest daily rate and selected every equipment item with that rate, including ties. I displayed the equipment IDs, names, and daily rates, sorted by ID.
 
 
 # Q7
@@ -271,6 +264,7 @@ q7 = equipment_clean.groupby("category").size().reset_index(
 )
 q7 = q7.sort_values("category")
 print(q7.to_string(index=False))
+# I grouped the cleaned equipment records by category and counted the items in each group. This includes equipment never rented, with categories displayed alphabetically.
 
 
 # Q8
@@ -280,6 +274,7 @@ q8 = rentals_clean.loc[
     "rental_id"
 ].count()
 print(q8)
+# I counted rentals starting strictly after September 15, 2026. Rentals starting on that date are excluded.
 
 
 # Q9
@@ -294,12 +289,12 @@ rentals_equipment["revenue"] = (
     * rentals_equipment["rental_days"]
     * rentals_equipment["daily_rate"]
 )
-
 q9 = rentals_equipment.loc[
     rentals_equipment["rental_days"] > 3,
     "revenue"
 ].sum()
 print(f"{q9:.2f}")
+# I joined cleaned rentals with equipment data and calculated revenue as quantity × rental days × daily rate. I summed the revenue for rentals lasting more than three days and displayed two decimal places.
 
 
 # Q10
@@ -316,6 +311,7 @@ q10 = rentals_members.loc[
 ]
 q10 = q10.drop_duplicates().sort_values("member_id")
 print(q10.to_string(index=False))
+# I joined cleaned rentals with member data and selected Halifax members who rented at least four units in one transaction. I removed duplicate members and sorted by member ID.
 
 
 # Q11
@@ -328,6 +324,7 @@ q11 = rentals_members.loc[
 ]
 q11 = q11.drop_duplicates().sort_values("member_id")
 print(q11.to_string(index=False))
+# I selected Montreal members with rentals starting from September 1 through September 30, 2026. Each member appears once, sorted by member ID.
 
 
 # Q12
@@ -344,6 +341,7 @@ q12 = q12.sort_values(
     ascending=[False, True]
 )
 print(q12.to_string(index=False))
+# I counted rental transactions for each Ottawa member and kept those with more than two. I sorted by rental count descending, then member ID ascending.
 
 
 # Q13
@@ -359,6 +357,7 @@ q13 = q13.sort_values(
     ascending=[False, True]
 ).head(3)
 print(q13.to_string(index=False))
+# I summed the quantities rented for each equipment item and selected the top three. I sorted by total units descending, using equipment ID ascending to break ties.
 
 
 # Q14
@@ -382,6 +381,7 @@ print(q14.to_string(
     index=False,
     formatters={"total_spending": "{:.2f}".format}
 ))
+# I summed rental revenue for each member and selected everyone whose total matched the highest spending. I included ties and displayed the results by member ID, with spending formatted to two decimal places.
 
 
 # Q15
@@ -397,6 +397,7 @@ q15 = q15.loc[
 ]
 q15 = q15.sort_values("city")
 print(q15.to_string(index=False))
+# I counted rental transactions by the member’s city and selected every city tied for the largest count. I sorted the resulting cities alphabetically.
 
 
 # Q16
@@ -410,6 +411,7 @@ q16 = equipment_clean.loc[
 ]
 q16 = q16.sort_values("equipment_id")
 print(q16.to_string(index=False))
+# I selected Camping equipment whose IDs do not appear in the cleaned rentals table. I displayed the equipment IDs and names, sorted by ID.
 
 
 # Q17
@@ -423,6 +425,7 @@ q17 = (
 )
 q17 = q17.sort_values("year_month")
 print(q17.to_string(index=False))
+# I grouped rental start dates by year and month, then counted the transactions in each group. I displayed the results in chronological order.
 
 
 # Q18
@@ -442,6 +445,7 @@ q18 = rentals_details.loc[
 ]
 q18 = q18.drop_duplicates().sort_values("member_id")
 print(q18.to_string(index=False))
+# I labelled rentals High Value when revenue exceeded CAD 500, or when quantity was at least four and the member lived in Montreal; otherwise, I labelled them Standard. I listed unique members with High Value rentals, sorted by ID.
 
 
 # Q19
@@ -461,7 +465,7 @@ print(q19.to_string(
     index=False,
     formatters={"total_spending": "{:.2f}".format}
 ))
-
+# I calculated total spending per member within each city and kept everyone tied for that city’s highest total. Only members with rentals are included, sorted by city and member ID, with spending shown to two decimal places.
 
 
 # Q20
@@ -475,3 +479,4 @@ q20 = (
 q20 = q20.loc[q20["rental_count"] > 1]
 q20 = q20.sort_values(["member_id", "equipment_id"])
 print(q20.to_string(index=False))
+# I grouped cleaned rentals by member ID and equipment ID, then counted transactions for each pair. I kept pairs with more than one transaction and sorted by member ID, then equipment ID.
