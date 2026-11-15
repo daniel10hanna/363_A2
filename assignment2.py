@@ -461,3 +461,17 @@ print(q19.to_string(
     index=False,
     formatters={"total_spending": "{:.2f}".format}
 ))
+
+
+
+# Q20
+print("\n--- Q20 ---")
+q20 = (
+    rentals_clean
+    .groupby(["member_id", "equipment_id"])["rental_id"]
+    .count()
+    .reset_index(name="rental_count")
+)
+q20 = q20.loc[q20["rental_count"] > 1]
+q20 = q20.sort_values(["member_id", "equipment_id"])
+print(q20.to_string(index=False))
