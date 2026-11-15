@@ -232,3 +232,9 @@ q2 = members_clean.loc[
 ]
 q2 = q2.sort_values("member_id")
 print(q2.to_string(index=False))
+
+
+# Q3
+print("\n--- Q3 ---")
+q3 = len(members_clean)
+print(q3)
