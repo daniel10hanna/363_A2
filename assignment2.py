@@ -196,6 +196,7 @@ print("\n--- Rentals: final checks ---")
 print("Final row count:", len(rentals_clean))
 print("rental_id is unique:", rentals_clean["rental_id"].is_unique)
 
+#I cleaned the tables before joining them to remove incomplete, invalid, and duplicate records. Removing exact duplicates prevents the same records from being counted more than once, and checking rental references ensures that every retained rental matches an existing member and equipment item. This helps keep the transaction counts and revenue calculations accurate.
 
 
 # Task 3: Pandas queries
