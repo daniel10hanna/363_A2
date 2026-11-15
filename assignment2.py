@@ -243,3 +243,234 @@ print(q3)
 print("\n--- Q4 ---")
 q4 = rentals_clean.loc[rentals_clean["quantity"] > 5, "rental_id"].count()
 print(q4)
+
+
+# Q5
+print("\n--- Q5 ---")
+q5 = equipment_clean["daily_rate"].mean()
+print(f"{q5:.2f}")
+
+
+# Q6
+print("\n--- Q6 ---")
+q6 = equipment_clean.loc[
+    equipment_clean["daily_rate"] == equipment_clean["daily_rate"].max(),
+    ["equipment_id", "equipment_name", "daily_rate"]
+]
+q6 = q6.sort_values("equipment_id")
+print(q6.to_string(
+    index=False,
+    formatters={"daily_rate": "{:.2f}".format}
+))
+
+
+# Q7
+print("\n--- Q7 ---")
+q7 = equipment_clean.groupby("category").size().reset_index(
+    name="equipment_count"
+)
+q7 = q7.sort_values("category")
+print(q7.to_string(index=False))
+
+
+# Q8
+print("\n--- Q8 ---")
+q8 = rentals_clean.loc[
+    rentals_clean["rental_date"] > pd.Timestamp("2026-09-15"),
+    "rental_id"
+].count()
+print(q8)
+
+
+# Q9
+print("\n--- Q9 ---")
+rentals_equipment = rentals_clean.merge(
+    equipment_clean,
+    on="equipment_id",
+    how="inner"
+)
+rentals_equipment["revenue"] = (
+    rentals_equipment["quantity"]
+    * rentals_equipment["rental_days"]
+    * rentals_equipment["daily_rate"]
+)
+
+q9 = rentals_equipment.loc[
+    rentals_equipment["rental_days"] > 3,
+    "revenue"
+].sum()
+print(f"{q9:.2f}")
+
+
+# Q10
+print("\n--- Q10 ---")
+rentals_members = rentals_clean.merge(
+    members_clean,
+    on="member_id",
+    how="inner"
+)
+q10 = rentals_members.loc[
+    (rentals_members["city"] == "Halifax")
+    & (rentals_members["quantity"] >= 4),
+    ["member_id", "member_name"]
+]
+q10 = q10.drop_duplicates().sort_values("member_id")
+print(q10.to_string(index=False))
+
+
+# Q11
+print("\n--- Q11 ---")
+q11 = rentals_members.loc[
+    (rentals_members["city"] == "Montreal")
+    & (rentals_members["rental_date"] >= pd.Timestamp("2026-09-01"))
+    & (rentals_members["rental_date"] < pd.Timestamp("2026-10-01")),
+    ["member_id", "member_name"]
+]
+q11 = q11.drop_duplicates().sort_values("member_id")
+print(q11.to_string(index=False))
+
+
+# Q12
+print("\n--- Q12 ---")
+q12 = (
+    rentals_members.loc[rentals_members["city"] == "Ottawa"]
+    .groupby(["member_id", "member_name"])["rental_id"]
+    .count()
+    .reset_index(name="rental_count")
+)
+q12 = q12.loc[q12["rental_count"] > 2]
+q12 = q12.sort_values(
+    ["rental_count", "member_id"],
+    ascending=[False, True]
+)
+print(q12.to_string(index=False))
+
+
+# Q13
+print("\n--- Q13 ---")
+q13 = (
+    rentals_equipment
+    .groupby(["equipment_id", "equipment_name"])["quantity"]
+    .sum()
+    .reset_index(name="total_units")
+)
+q13 = q13.sort_values(
+    ["total_units", "equipment_id"],
+    ascending=[False, True]
+).head(3)
+print(q13.to_string(index=False))
+
+
+# Q14
+print("\n--- Q14 ---")
+rentals_details = rentals_equipment.merge(
+    members_clean,
+    on="member_id",
+    how="inner"
+)
+q14 = (
+    rentals_details
+    .groupby(["member_id", "member_name"])["revenue"]
+    .sum()
+    .reset_index(name="total_spending")
+)
+q14 = q14.loc[
+    q14["total_spending"] == q14["total_spending"].max()
+]
+q14 = q14.sort_values("member_id")
+print(q14.to_string(
+    index=False,
+    formatters={"total_spending": "{:.2f}".format}
+))
+
+
+# Q15
+print("\n--- Q15 ---")
+q15 = (
+    rentals_members
+    .groupby("city")["rental_id"]
+    .count()
+    .reset_index(name="rental_count")
+)
+q15 = q15.loc[
+    q15["rental_count"] == q15["rental_count"].max()
+]
+q15 = q15.sort_values("city")
+print(q15.to_string(index=False))
+
+
+# Q16
+print("\n--- Q16 ---")
+q16 = equipment_clean.loc[
+    (equipment_clean["category"] == "Camping")
+    & (~equipment_clean["equipment_id"].isin(
+        rentals_clean["equipment_id"]
+    )),
+    ["equipment_id", "equipment_name"]
+]
+q16 = q16.sort_values("equipment_id")
+print(q16.to_string(index=False))
+
+
+# Q17
+print("\n--- Q17 ---")
+q17 = (
+    rentals_clean
+    .groupby(rentals_clean["rental_date"].dt.to_period("M"))["rental_id"]
+    .count()
+    .reset_index(name="rental_count")
+    .rename(columns={"rental_date": "year_month"})
+)
+q17 = q17.sort_values("year_month")
+print(q17.to_string(index=False))
+
+
+# Q18
+print("\n--- Q18 ---")
+rentals_details["rental_label"] = "Standard"
+rentals_details.loc[
+    (rentals_details["revenue"] > 500)
+    | (
+        (rentals_details["quantity"] >= 4)
+        & (rentals_details["city"] == "Montreal")
+    ),
+    "rental_label"
+] = "High Value"
+q18 = rentals_details.loc[
+    rentals_details["rental_label"] == "High Value",
+    ["member_id", "member_name"]
+]
+q18 = q18.drop_duplicates().sort_values("member_id")
+print(q18.to_string(index=False))
+
+
+# Q19
+print("\n--- Q19 ---")
+q19 = (
+    rentals_details
+    .groupby(["city", "member_id", "member_name"])["revenue"]
+    .sum()
+    .reset_index(name="total_spending")
+)
+q19 = q19.loc[
+    q19["total_spending"]
+    == q19.groupby("city")["total_spending"].transform("max")
+]
+q19 = q19.sort_values(["city", "member_id"])
+print(q19.to_string(
+    index=False,
+    formatters={"total_spending": "{:.2f}".format}
+))
+
+
+# Q20
+print("\n--- Q20 ---")
+q20 = (
+    rentals_clean
+    .groupby(["member_id", "equipment_id"])["rental_id"]
+    .count()
+    .reset_index(name="rental_count")
+)
+q20 = q20.loc[q20["rental_count"] > 1]
+q20 = q20.sort_values(["member_id", "equipment_id"])
+print(q20.to_string(index=False))
